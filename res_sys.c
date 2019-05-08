@@ -75,6 +75,7 @@ Graph * make_graph(){
         while(fgets(buffer, 100, f) != NULL)
         	e++;
         fclose(f);
+	e = e*2;
 	graph->num_edges = e;
 	length = v;
 	
@@ -91,8 +92,9 @@ Graph * make_graph(){
 		sscanf(buffer, "%s %s %d", source, dest, &dist);	
 		//printf("%s %s %d\n", source, dest, dist);
 		edge[i] = create_edge(source, dest, dist);
+		edge[i+1] = create_edge(dest, source, dist);
 		//printf("%d, %d, %d\n", edge[i].source, edge[i].destination, edge[i].dist);
-		i++;
+		i+=2;
 	}
         fclose(f);
 	return graph;	 
@@ -143,12 +145,11 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 			int a = graph->edge[j].source;
 			int b = graph->edge[j].destination;
 			int weight = graph->edge[j].dist;
-			//printf("%d %d %d\n", a, b, weight);
+			//printf("a:%d b:%d weight:%d\n", dist[a], dist[b], weight);
 			if(dist[a] != INT_MAX && dist[a] + weight < dist[b]){
 				dist[b] = dist[a] + weight;
-				//printf("here\n");
+			//	printf("%d < %d here with a = %d and b = %d\n", dist[a] = weight, dist[b], a, b);
 			}
-			//printf("here\n");
 		}
 	printf("SHORTEST DIST: %d\n", dist[des]);
 	return 0;
