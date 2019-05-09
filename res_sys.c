@@ -4,6 +4,7 @@
 const int INT_MAX = 10000;
 char ** v_arr;
 int length;
+//int * path;
 
 typedef struct edge{
 	int  source;
@@ -140,6 +141,9 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 		dist[i] = INT_MAX;
 	dist[src] = 0;
 	
+	int path[v];
+	//int path_size = 0;
+		
 	for(int i = 1; i <= v - 1; i++)
 		for(int j = 0; j < e; j++){
 			int a = graph->edge[j].source;
@@ -149,9 +153,30 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 			if(dist[a] != INT_MAX && dist[a] + weight < dist[b]){
 				dist[b] = dist[a] + weight;
 			//	printf("%d < %d here with a = %d and b = %d\n", dist[a] = weight, dist[b], a, b);
+				path[b] = a;
+			//path_size++;
 			}
 		}
 	printf("SHORTEST DIST: %d\n", dist[des]);
+	int * result = calloc(1, v);
+	int counter = 0;
+	int i = des;
+	
+	do{ 
+		i = path[i];
+		result[counter] = i;
+		counter++;
+		// printf("iteration %d path to %d\n", counter, i);
+		//i = path[i];
+	}while(i != src);
+	
+	//printf("%d -> ", src);
+
+	for(int i = counter-1; i >= 0; i--)
+	{
+		printf("%d -> ", result[i]);
+	}
+	printf("%d\n", des);
 	return 0;
 }
 
