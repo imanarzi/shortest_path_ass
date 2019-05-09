@@ -134,7 +134,7 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 	dist[src] = 0;
 	
 	int path[v];
-		
+	int weights[v];	
 	for(int i = 1; i <= v - 1; i++)
 		for(int j = 0; j < e; j++){
 			int a = graph->edge[j].source;
@@ -143,26 +143,30 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 			if(dist[a] != INT_MAX && dist[a] + weight < dist[b]){
 				dist[b] = dist[a] + weight;
 				path[b] = a;
+				weights[b] = weight;
 			}
 		}
 	printf("Total distance is: %d\n", dist[des]);
-	int * result = calloc(1, v);
+	//int ** result = calloc(1, sizeof(int*)*v);
+	int result[v][2];
 	int counter = 0;
 	int i = des;
-	
 	do{ 
 		i = path[i];
-		result[counter] = i;
+		result[counter][0] = i;
+		result[counter][1] = weights[i];
 		counter++;
 	}while(i != src);
 	
+	//for(int i = 0; i < counter; i++)
+	//	printf("%d\n", weights);	
 
 	for(int i = counter-1; i >= 1; i--)
 	{
-		printf("%s -> ", v_arr[result[i]]);
-		printf("%s\n", v_arr[result[i - 1]]);
+		printf("%s -> ", v_arr[result[i][0]]);
+		printf("%s %d\n", v_arr[result[i - 1][0]], result[i - 1][1]);
 	}
-	printf("%s -> %s\n", v_arr[result[0]], v_arr[des]);
+	printf("%s -> %s %d\n", v_arr[result[0][0]], v_arr[des], weights[des]);
 	return 0;
 }
 
