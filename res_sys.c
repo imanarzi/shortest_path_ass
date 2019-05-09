@@ -4,6 +4,8 @@
 const int INT_MAX = 10000;
 char ** v_arr;
 int length;
+char * filename_a;
+char * filename_d;
 //int * path;
 
 typedef struct edge{
@@ -52,7 +54,7 @@ Graph * make_graph(){
 	//count vertices
 	int v = 0;
 	FILE* f;
-        f = fopen("small-airports.txt", "r");
+        f = fopen(filename_a, "r");
         char buffer[100];
         while(fgets(buffer, 100, f) != NULL)
                v++;
@@ -62,7 +64,7 @@ Graph * make_graph(){
 	v_arr = malloc(sizeof(char*) * v);
 	//printf("%d\n", v);
 	int index = 0;
-	f = fopen("small-airports.txt", "r");
+	f = fopen(filename_a, "r");
         while(fgets(buffer, 100, f) != NULL){
         	//printf("here\n");
 		v_arr[index] = malloc(4);
@@ -72,7 +74,7 @@ Graph * make_graph(){
 	
 	//count edges
 	int e = 0;
-        f = fopen("small-dists.txt", "r");
+        f = fopen(filename_d, "r");
         while(fgets(buffer, 100, f) != NULL)
         	e++;
         fclose(f);
@@ -83,7 +85,7 @@ Graph * make_graph(){
 	//add edges to graph
 	Edge * edge = malloc(sizeof(Edge) * e);
 	graph->edge = edge;
-        f = fopen("small-dists.txt", "r");
+        f = fopen(filename_d, "r");
 	int i = 0;
 	//printf("here\n");
         while(fgets(buffer, 100, f) != NULL){
@@ -101,14 +103,11 @@ Graph * make_graph(){
 	return graph;	 
 }
 int bellman_ford(Graph * graph, char * source, char * dest){
-	//printf("here\n");
 	int v = graph->num_vertices;
-        //v_arr = malloc(sizeof(char*) * v);
         FILE* f;
 	char buffer[100];
-	f = fopen("small-airports.txt", "r");
+	f = fopen(filename_a, "r");
 	int index = 0;
-        //printf("here\n");
 	char temp[4];
 	while(fgets(buffer, 100, f) != NULL){
 		sscanf(buffer, "%s", temp);
@@ -116,23 +115,16 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 		strcpy(v_arr[index], temp);
 		index++; 
         }
-	//printf("here\n");
-	//for(int i = 0; i < length; i++)
-		//printf("%s\n", v_arr[i]);
 	int src = 0;
 	int des = 0;
-	//printf("here");
-	//printf("SOURCE IS CHAR %s\n", source); 
 	for(int i = 0; i < length; i++){
-		//printf("%s\n", v_arr[i]);
 		if(strcmp(v_arr[i], source) == 0){
 			src = i;	
-		//	printf("SOURCE IS: %d\n", i);
 		}
 		if(strcmp(v_arr[i], dest) == 0)
 			des = i;
 	}
-	printf("src is %d, dest is %d\n", src, des);
+	//printf("src is %d, dest is %d\n", src, des);
         fclose(f);	
 	int e = graph->num_edges;
         int dist[v];
@@ -142,22 +134,18 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 	dist[src] = 0;
 	
 	int path[v];
-	//int path_size = 0;
 		
 	for(int i = 1; i <= v - 1; i++)
 		for(int j = 0; j < e; j++){
 			int a = graph->edge[j].source;
 			int b = graph->edge[j].destination;
 			int weight = graph->edge[j].dist;
-			//printf("a:%d b:%d weight:%d\n", dist[a], dist[b], weight);
 			if(dist[a] != INT_MAX && dist[a] + weight < dist[b]){
 				dist[b] = dist[a] + weight;
-			//	printf("%d < %d here with a = %d and b = %d\n", dist[a] = weight, dist[b], a, b);
 				path[b] = a;
-			//path_size++;
 			}
 		}
-	printf("SHORTEST DIST: %d\n", dist[des]);
+	printf("Total distance is: %d\n", dist[des]);
 	int * result = calloc(1, v);
 	int counter = 0;
 	int i = des;
@@ -166,25 +154,28 @@ int bellman_ford(Graph * graph, char * source, char * dest){
 		i = path[i];
 		result[counter] = i;
 		counter++;
-		// printf("iteration %d path to %d\n", counter, i);
-		//i = path[i];
 	}while(i != src);
 	
-	//printf("%d -> ", src);
 
-	for(int i = counter-1; i >= 0; i--)
+	for(int i = counter-1; i >= 1; i--)
 	{
-		printf("%d -> ", result[i]);
+		printf("%s -> ", v_arr[result[i]]);
+		printf("%s\n", v_arr[result[i - 1]]);
 	}
-	printf("%d\n", des);
+	printf("%s -> %s\n", v_arr[result[0]], v_arr[des]);
 	return 0;
 }
 
 
-int main(){
+int main(int argc, char ** argv){
 	//fflush(stdin);
+	filename_a = malloc(50);
+	strcpy(filename_a, argv[1]);
+	filename_d = malloc(50);
+	strcpy(filename_d, argv[2]);
+	//printf("%s %s\n", filename_a, filename_d);
 	Graph * graph = make_graph();
-	printf("v: %d e: %d\n", graph->num_vertices, graph->num_edges);
+	//printf("v: %d e: %d\n", graph->num_vertices, graph->num_edges);
 	while(1){
 		char a[100];
 		printf("enter command> ");
@@ -192,7 +183,7 @@ int main(){
 		if(strcmp(a, "airports") == 0){
 			//printf("here\n");
 			FILE* f;
-			f = fopen("small-airports.txt", "r");
+			f = fopen(filename_a, "r");
 			char buffer[100];
 			while(fgets(buffer, 100, f) != NULL)
 				printf("%s", buffer); 
